@@ -1,28 +1,132 @@
 import java.util.Random;
 
 public class Tabuleiro {
-    private Setor[][] map; //[cite: 18]
-    private int fonteInfecX; //[cite: 18]
-    private int fonteInfecY; //[cite: 18]
+    private Setor[][] map; 
+    private int fonteInfecX; 
+    private int fonteInfecY; 
 
     public Tabuleiro() {
-        // O cenário é formado por um tabuleiro 5x5[cite: 11]
         map = new Setor[5][5];
     }
 
     public void iniciarTabuleiro() {
-        Random aleatorio = new Random(); //[cite: 16]
+        boolean mapaValido = false;
         
-        // A fonte de infecção deve ser aleatoriamente posicionada, exceto no centro[cite: 11]
+        while (!mapaValido) {
+            gerarEstruturaAleatoria();
+            posicionarFonteDeInfeccao();
+            mapaValido = true; // Fazer algoritmo pra ver se tem caminho viável até o centro
+        }
+    }
+
+    private void gerarEstruturaAleatoria() {
+        Random aleatorio = new Random();
+        // 1. Cria os setores 0: Normal, 1: Oculto, 2: Privado
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                if (i == 2 && j == 2) {
+                    map[i][j] = new SetorNormal(i, j);
+                } else {    
+                    int tipoSetor = aleatorio.nextInt(3);
+                    switch (tipoSetor) {
+                        case 0:
+                            map[i][j] = new SetorNormal(i, j);
+                            break;
+                        case 1:
+                            map[i][j] = new SetorOculto(i, j);
+                            break;
+                        case 2:
+                            map[i][j] = new SetorPrivado(i, j);
+                            break;
+                    }
+                }
+            }
+        }
+        // 2. Define portas aleatórias e faz a sincronização delas
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                // Norte (0)
+                if (i > 0) map[i][j].setPorta(0, aleatorio.nextBoolean());
+                // Sul (1)
+                if (i < 4) map[i][j].setPorta(1, aleatorio.nextBoolean());
+                // Leste (2)
+                if (j < 4) map[i][j].setPorta(2, aleatorio.nextBoolean());
+                // Oeste (3)
+                if (j > 0) map[i][j].setPorta(3, aleatorio.nextBoolean());
+                // Sincronizar portas adjacentes para consistência arquitetural
+                if (i > 0) map[i-1][j].setPorta(1, map[i][j].getPortas()[0]);
+                if (j > 0) map[i][j-1].setPorta(2, map[i][j].getPortas()[3]);
+            }
+        }
+
+        // 3. Abre as 4 portas do centro
+        map[2][2].setPorta(0, true); // Norte
+        map[2][2].setPorta(1, true); // Sul
+        map[2][2].setPorta(2, true); // Leste
+        map[2][2].setPorta(3, true); // Oeste
+
+        // 4. Abre portas adjacentes ao centro 
+        map[1][2].setPorta(1, true); // De cima
+        map[2][3].setPorta(3, true); // Direita
+        map[3][2].setPorta(0, true); // De baixo
+        map[2][1].setPorta(2, true); // Esquerda
+    }
+
+    private void posicionarFonteDeInfeccao() {
+        Random aleatorio = new Random();
+        // 1. Só garante que a fonte de infecção não fique no centro
         do {
             fonteInfecX = aleatorio.nextInt(5);
             fonteInfecY = aleatorio.nextInt(5);
-        } while (fonteInfecX == 2 && fonteInfecY == 2); // 2,2 é o centro em uma matriz 0-4
-
-        // Aqui você instanciaria os setores normais, ocultos ou privados nas posições da matriz
+        } while (fonteInfecX == 2 && fonteInfecY == 2); 
     }
 
-    public void exibirTabuleiro() {
-        // Lógica para imprimir o estado atual do tabuleiro no terminal
+    public void exibirTabuleiro(JogadorSimples p1, JogadorSuporte p2) {
+        // 1. Tabela para impressão do mapa
+        System.out.println("\n--- Mapa do Sistema ---");
+        System.out.println("\n  1     2     3     4     5");
+        for (int i = 0; i < 5; i++) {
+            for (int j = 0; j < 5; j++) {
+                // 2. Imprime jogadores no mapa, acho que é pra tirar a fonte depois
+                if ((p1.getPosX() == i && p1.getPosY() == j) && (p2.getPosX() == i && p2.getPosY() == j)) {
+                    System.out.print("[ P ] "); 
+                } else if ((p1.getPosX() == i && p1.getPosY() == j)) {
+                    System.out.print("[P1 ] "); 
+                } else if ((p2.getPosX() == i && p2.getPosY() == j)) {
+                    System.out.print("[P2 ] "); 
+                } else if (i == 2 && j == 2) {
+                    System.out.print("[ C ] "); 
+                } else if (i == fonteInfecX && j == fonteInfecY) {
+                    System.out.print("[ X ] "); 
+                } else {
+                    System.out.print("[   ] ");
+                }
+            }
+            System.out.println(); 
+        }
+
+        // 3. Imprime os dados do Setor Atual em texto corrido
+        Setor setorAtual = map[p1.getPosX()][p1.getPosY()];
+        
+        System.out.println("\n--- Detalhes do Setor [" + (p1.getPosX() + 1) + "," + (p1.getPosY() + 1) + "] ---");
+        if (setorAtual instanceof SetorOculto) {
+            System.out.println("Este é um Setor Oculto. Seus ataques podem falhar.");
+        } else if (setorAtual instanceof SetorPrivado) {
+            System.out.println("Este é um Setor Privado. A ação de procurar itens está bloqueada.");
+        } else {
+            System.out.println("Este é um Setor Normal. Sem restrições especiais.");
+        }
+
+        System.out.print("Portas disponíveis: ");
+        if (setorAtual.getPortas()[0]) System.out.print("Norte(W) ");
+        if (setorAtual.getPortas()[1]) System.out.print("Sul(S) ");
+        if (setorAtual.getPortas()[2]) System.out.print("Leste(D) ");
+        if (setorAtual.getPortas()[3]) System.out.print("Oeste(A) ");
+    
+        System.out.println("\nInimigos no local: " + setorAtual.getInimigos().size());
+        for (int k = 0; k < setorAtual.getInimigos().size(); k++) {
+            Inimigo ini = setorAtual.getInimigos().get(k);
+            System.out.println("Vírus " + (k+1) + " -> ATK: " + ini.getAtk() + " | DEF: " + ini.getDef());
+        }
     }
 }

@@ -4,17 +4,20 @@ import java.util.Random;
 public abstract class Setor {
     private int x;
     private int y;
-    private boolean portasVisiveis;
+    private boolean[] portasVisiveis;
     private boolean visitado;
     private ArrayList<Inimigo> inimigos; 
 
     public Setor(int x, int y) {
         this.x = x;
         this.y = y;
-        this.portasVisiveis = false;
+        this.portasVisiveis = new boolean[4];
         this.visitado = false;
         this.inimigos = new ArrayList<>();
     }
+
+    public boolean[] getPortas() { return portasVisiveis; }
+    public void setPorta(int direcao, boolean estado) { this.portasVisiveis[direcao] = estado; }
 
     public int getX() { return x; }
     public int getY() { return y; }

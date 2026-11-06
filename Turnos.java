@@ -17,6 +17,11 @@ public class Turnos {
         player2.setPosX(2); player2.setPosY(2);
     }
 
+    public void exibirTelaDoJogo() {
+        System.out.println("\n--- Turno Atual: " + cicloAtual + " ---");
+        tabuleiro.exibirTabuleiro(player1, player2);
+    }
+
     public void carregarTurnosdosPlayers() { 
     }
 
