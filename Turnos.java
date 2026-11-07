@@ -1,3 +1,5 @@
+import java.util.Scanner;
+
 public class Turnos {
     private int cicloAtual; 
     private JogadorSimples player1; 
@@ -17,12 +19,28 @@ public class Turnos {
         player2.setPosX(2); player2.setPosY(2);
     }
 
-    public void exibirTelaDoJogo() {
+    public void carregarTurnosdosPlayers() { 
+        Scanner scanner = new Scanner(System.in);
         System.out.println("\n--- Turno Atual: " + cicloAtual + " ---");
         tabuleiro.exibirTabuleiro(player1, player2);
-    }
+        // 1. Turno do Jogador 1 (Simples)
+        System.out.println("\n--- TURNO DO JOGADOR 1 (SIMPLES) ---");
+        tabuleiro.exibirDetalhesdoSetor(player1); // Chama a tela focada no P1
+        
+        // (Exemplo do loop de ações do P1)
+        // System.out.println("Escolha sua ação: 1) Mover  2) Atacar  3) Procurar");
+        // int acaoP1 = scanner.nextInt();
+        // Lógica da ação do P1...
 
-    public void carregarTurnosdosPlayers() { 
+
+        // 2. Turno do Jogador 2 (Suporte)
+        System.out.println("\n--- TURNO DO JOGADOR 2 (SUPORTE) ---");
+        tabuleiro.exibirDetalhesdoSetor(player2); // Chama a tela focada no P2
+        
+        // (Exemplo do loop de ações do P2)
+        // System.out.println("Escolha sua ação: 1) Mover  2) Atacar  3) Procurar  4) Curar");
+        // int acaoP2 = scanner.nextInt();
+        // Lógica da ação do P2...
     }
 
     public void carregarTurnosdosInimigos() { 
@@ -30,7 +48,8 @@ public class Turnos {
     }
 
     public boolean verificarFimdeJogo() { 
-        if (cicloAtual > 25) { 
+        // colocar 25 dps
+        if (cicloAtual > 1) { 
             return true;
         }
         if (player1.getDef() <= 0 && player2.getDef() <= 0) {

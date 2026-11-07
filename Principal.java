@@ -18,8 +18,6 @@ public class Principal {
                 Turnos jogo = new Turnos();
                 jogo.iniciarJogo();
                 while (!jogo.verificarFimdeJogo()) {
-                    jogo.exibirTelaDoJogo();
-                    System.out.println("\n--- Turno dos Jogadores ---");
                     jogo.carregarTurnosdosPlayers(); 
                     if (jogo.verificarFimdeJogo()) {
                         break;
