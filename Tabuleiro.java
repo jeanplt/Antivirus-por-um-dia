@@ -203,7 +203,7 @@ public class Tabuleiro {
             System.out.println(); 
         }
     }
-    public void exiberPortasDisponiveis(TipodePersonagem player) {
+    public void exiberPortasDisponiveis(Jogador player) {
         // Mostra as portas para Player pode se movimentar durante seu turno
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
         System.out.print("Portas disponíveis: ");
@@ -213,18 +213,18 @@ public class Tabuleiro {
         if (setorAtual.getPortas()[3]) System.out.print("Oeste(A) ");
     }
 
-    public void exibirStatusdoPlayer(TipodePersonagem player) {
+    public void exibirStatusdoPlayer(Jogador player) {
         System.out.println("\nAtaque/Defesa do Personagem: " + (player.getAtk()) + "/" + (player.getDef()));
     }
 
-    public void exibirDetalhesdoSetor(TipodePersonagem player) {
+    public void exibirDetalhesdoSetor(Jogador player) {
         // Imprime os dados do Setor Atual do player
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
         System.out.println("\n--- Detalhes do Setor [" + (player.getPosX() + 1) + "," + (player.getPosY() + 1) + "] ---");
         setorAtual.aplicarRegraSetor(player);
     }
 
-    public void exibirInimigosdoSetor(TipodePersonagem player) {
+    public void exibirInimigosdoSetor(Jogador player) {
         // Imprime os inimigos do setor se eles existirem
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
         int i = setorAtual.getInimigos().size();

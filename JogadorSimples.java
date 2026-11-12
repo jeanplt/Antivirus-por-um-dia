@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class JogadorSimples extends TipodePersonagem implements AcoesExploracao {
+public class JogadorSimples extends Jogador {
 
     public JogadorSimples() {
         super(2, 6); 

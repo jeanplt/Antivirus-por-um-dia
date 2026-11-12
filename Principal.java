@@ -20,11 +20,11 @@ public class Principal {
                 jogo.iniciarJogo();
                 while (!jogo.verificarFimdeJogo()) {
                     System.out.println("\n--- Turno Atual: " + jogo.getCicloAtual() + " ---");
-                    jogo.carregarTurnodoPlayer1();
+                    jogo.carregarTurnodoPlayers(jogo.getPlayer1());
                     if (jogo.verificarFimdeJogo()) {
                         break;
                     }
-
+                    jogo.carregarTurnodoPlayers(jogo.getPlayer2());
                     System.out.println("\n--- Turno dos Inimigos ---");
                     jogo.carregarTurnosdosInimigos();
                 }
