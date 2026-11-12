@@ -2,23 +2,25 @@ import java.util.Scanner;
 
 public class Principal {
     public static void main(String[] args) {
-        // 1. Inicio do programa
+        // Inicio do programa
         System.out.println("\u001B[32m" + "Antivírus por um dia" + "\u001B[0m");
         Scanner scanner = new Scanner(System.in);
-        // 2. Menu do jogo, sempre que acaba volta pra ele, pra sair aperta 3
+        // Load do Menu do jogo, sempre que acaba volta pra ele, pra sair tem que apertar 3
         while (true) {
             System.out.println("Menu (selecione uma opção):");
             System.out.println("1) Iniciar Jogo");
             System.out.println("2) Controles");
             System.out.println("3) Sair");
             int opcao = scanner.nextInt();
+            // Switch case com as opções do Menu
             switch (opcao) {
-            case 1:
+            case 1: // Início do jogo
                 System.out.println("\u001B[32m" + "Iniciando Antivírus por um dia..." + "\u001B[0m"); 
                 Turnos jogo = new Turnos();
                 jogo.iniciarJogo();
                 while (!jogo.verificarFimdeJogo()) {
-                    jogo.carregarTurnosdosPlayers(); 
+                    System.out.println("\n--- Turno Atual: " + jogo.getCicloAtual() + " ---");
+                    jogo.carregarTurnodoPlayer1();
                     if (jogo.verificarFimdeJogo()) {
                         break;
                     }
@@ -28,7 +30,7 @@ public class Principal {
                 }
                 System.out.println("\nFim de jogo!");
                 break;
-            case 2:
+            case 2: // Mostra só controles e volta pro Menu apertando qualquer coisa
                 System.out.println("\u001B[32m" + "Controles do jogo:" + "\u001B[0m");
                 System.out.println("Movimentação: W(cima), A(esquerda), S(baixo), D(direita)");
                 System.out.println("Ataque: E");
@@ -38,11 +40,11 @@ public class Principal {
                 Scanner continueScanner = new Scanner(System.in);
                 continueScanner.nextLine();
                 break;
-            case 3:
+            case 3: // Fecha o programa
                 System.out.println("\u001B[32m" + "Saindo do jogo..." + "\u001B[0m");
                 scanner.close();
                 System.exit(0);
-            default:
+            default: // Se comeu bola e digitou algum comando inválido
                 System.out.println("\u001B[31m" + "Opção inválida." + "\u001B[0m");
                 break;
             }

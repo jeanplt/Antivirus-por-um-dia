@@ -11,9 +11,21 @@ public class Tabuleiro {
         map = new Setor[5][5];
     }
 
+    public Setor getSetor(int x, int y) {
+        return map[x][y];
+    }
+
+    public int getFonteInfecX() {
+        return this.fonteInfecX;
+    }
+
+    public int getFonteInfecY() {
+        return this.fonteInfecY;
+    }
+
     public void iniciarTabuleiro() {
         boolean mapaValido = false;
-        
+        // Laço para gerar as paredes do mapa, posicionar a infecção e verificar se é possível chegar até ela a partir do centro
         while (!mapaValido) {
             gerarEstruturaAleatoria();
             posicionarFonteDeInfeccao();
@@ -23,11 +35,15 @@ public class Tabuleiro {
 
     private void gerarEstruturaAleatoria() {
         Random aleatorio = new Random();
-        // 1. Cria os setores 0: Normal, 1: Oculto, 2: Privado
+        // Mapeamento dos Setores: 
+        //      0: Normal 
+        //      1: Oculto 
+        //      2: Privado
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                if (i == 2 && j == 2) {
+                if (i == 2 && j == 2) { // Garante que o centro é setor Normal e visitado
                     map[i][j] = new SetorNormal(i, j);
+                    map[i][j].setVisitado(true);
                 } else {    
                     int tipoSetor = aleatorio.nextInt(3);
                     switch (tipoSetor) {
@@ -44,7 +60,7 @@ public class Tabuleiro {
                 }
             }
         }
-        // 2. Define portas aleatórias e faz a sincronização delas
+        // Novo laço agora para definir as portas para os setores
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
                 // Norte (0)
@@ -60,14 +76,12 @@ public class Tabuleiro {
                 if (j > 0) map[i][j-1].setPorta(2, map[i][j].getPortas()[3]);
             }
         }
-
-        // 3. Abre as 4 portas do centro
+        // Força existir 4 portas no centro
         map[2][2].setPorta(0, true); // Norte
         map[2][2].setPorta(1, true); // Sul
         map[2][2].setPorta(2, true); // Leste
         map[2][2].setPorta(3, true); // Oeste
-
-        // 4. Abre portas adjacentes ao centro 
+        // Força existir 4 portas adjacentes ao centro
         map[1][2].setPorta(1, true); // De cima
         map[2][3].setPorta(3, true); // Direita
         map[3][2].setPorta(0, true); // De baixo
@@ -76,8 +90,8 @@ public class Tabuleiro {
 
     private void posicionarFonteDeInfeccao() {
         Random aleatorio = new Random();
-        // 1. Só garante que a fonte de infecção não fique no centro
-        do {
+        // Só garante que a fonte de infecção não fique no centro
+        do { 
             fonteInfecX = aleatorio.nextInt(5);
             fonteInfecY = aleatorio.nextInt(5);
         } while (fonteInfecX == 2 && fonteInfecY == 2); 
@@ -88,7 +102,7 @@ public class Tabuleiro {
         boolean[][] visitados = new boolean[5][5];
         Queue<int[]> fila = new LinkedList<>();
 
-        /* DEBUG
+        /* DEBUG apagar dps
         int[][][] pai = new int[5][5][2]; 
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
@@ -97,7 +111,6 @@ public class Tabuleiro {
             }
         }   
         */
-
 
         // Inicia a busca pela coordenada de origem [2, 2]
         fila.add(new int[]{startX, startY});
@@ -108,6 +121,7 @@ public class Tabuleiro {
         int[] movX = {-1, 1, 0, 0}; 
         int[] movY = {0, 0, 1, -1};
 
+        // Laço que valida o caminho
         while (!fila.isEmpty()) {
             int[] atual = fila.poll();
             int currX = atual[0];
@@ -115,7 +129,7 @@ public class Tabuleiro {
 
             // Se a posição atual for igual a da infecção, o caminho é válido!
             if (currX == targetX && currY == targetY) {
-                /* DEBUG
+                /* DEBUG apagar dps
                 java.util.ArrayList<String> caminho = new java.util.ArrayList<>();
                 int pX = targetX;
                 int pY = targetY;
@@ -150,7 +164,7 @@ public class Tabuleiro {
                     // Garante que o vizinho não sai do tabuleiro (0 a 4) e ainda não foi visitado
                     if (nextX >= 0 && nextX < 5 && nextY >= 0 && nextY < 5 && !visitados[nextX][nextY]) {
                         visitados[nextX][nextY] = true;
-                        /* DEBUG
+                        /* DEBUG apagar dps
                         pai[nextX][nextY][0] = currX;
                         pai[nextX][nextY][1] = currY;
                         */
@@ -160,17 +174,18 @@ public class Tabuleiro {
             }
         }
     
-        // Se a fila esvaziar e não achar o X, significa que o labirinto não tem saída
+        // Se a fila esvaziar e não achar o X, tem que recriar o tabuleiro
         return false;
     }
 
     public void exibirTabuleiro(JogadorSimples p1, JogadorSuporte p2) {
-        // 1. Tabela para impressão do mapa
+        // Tabela para impressão do mapa
         System.out.println("\n--- Mapa do Sistema ---");
-        System.out.println("\n  1     2     3     4     5");
+        System.out.println("    1     2     3     4     5");
         for (int i = 0; i < 5; i++) {
+            System.out.print((i + 1) + " ");
             for (int j = 0; j < 5; j++) {
-                // 2. Imprime jogadores no mapa, acho que é pra tirar a fonte depois
+                // Imprime jogadores no mapa, acho que é pra tirar a fonte depois
                 if ((p1.getPosX() == i && p1.getPosY() == j) && (p2.getPosX() == i && p2.getPosY() == j)) {
                     System.out.print("[ P ] "); 
                 } else if ((p1.getPosX() == i && p1.getPosY() == j)) {
@@ -187,56 +202,40 @@ public class Tabuleiro {
             }
             System.out.println(); 
         }
-        /* 
-        // 3. Imprime os dados do Setor Atual em texto corrido
-        Setor setorAtual = map[p1.getPosX()][p1.getPosY()];
-        
-        System.out.println("\n--- Detalhes do Setor [" + (p1.getPosX() + 1) + "," + (p1.getPosY() + 1) + "] ---");
-        if (setorAtual instanceof SetorOculto) {
-            System.out.println("Este é um Setor Oculto. Seus ataques podem falhar.");
-        } else if (setorAtual instanceof SetorPrivado) {
-            System.out.println("Este é um Setor Privado. A ação de procurar itens está bloqueada.");
-        } else {
-            System.out.println("Este é um Setor Normal. Sem restrições especiais.");
-        }
-
+    }
+    public void exiberPortasDisponiveis(TipodePersonagem player) {
+        // Mostra as portas para Player pode se movimentar durante seu turno
+        Setor setorAtual = map[player.getPosX()][player.getPosY()];
         System.out.print("Portas disponíveis: ");
         if (setorAtual.getPortas()[0]) System.out.print("Norte(W) ");
         if (setorAtual.getPortas()[1]) System.out.print("Sul(S) ");
         if (setorAtual.getPortas()[2]) System.out.print("Leste(D) ");
         if (setorAtual.getPortas()[3]) System.out.print("Oeste(A) ");
-    
-        System.out.println("\nInimigos no local: " + setorAtual.getInimigos().size());
-        for (int k = 0; k < setorAtual.getInimigos().size(); k++) {
-            Inimigo ini = setorAtual.getInimigos().get(k);
-            System.out.println("Vírus " + (k+1) + " -> ATK: " + ini.getAtk() + " | DEF: " + ini.getDef());
-        }
-        */
+    }
+
+    public void exibirStatusdoPlayer(TipodePersonagem player) {
+        System.out.println("\nAtaque/Defesa do Personagem: " + (player.getAtk()) + "/" + (player.getDef()));
     }
 
     public void exibirDetalhesdoSetor(TipodePersonagem player) {
-        // 3. Imprime os dados do Setor Atual em texto corrido
+        // Imprime os dados do Setor Atual do player
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
-        
         System.out.println("\n--- Detalhes do Setor [" + (player.getPosX() + 1) + "," + (player.getPosY() + 1) + "] ---");
-        if (setorAtual instanceof SetorOculto) {
-            System.out.println("Este é um Setor Oculto. Seus ataques podem falhar.");
-        } else if (setorAtual instanceof SetorPrivado) {
-            System.out.println("Este é um Setor Privado. A ação de procurar itens está bloqueada.");
-        } else {
-            System.out.println("Este é um Setor Normal. Sem restrições especiais.");
-        }
+        setorAtual.aplicarRegraSetor(player);
+    }
 
-        System.out.print("Portas disponíveis: ");
-        if (setorAtual.getPortas()[0]) System.out.print("Norte(W) ");
-        if (setorAtual.getPortas()[1]) System.out.print("Sul(S) ");
-        if (setorAtual.getPortas()[2]) System.out.print("Leste(D) ");
-        if (setorAtual.getPortas()[3]) System.out.print("Oeste(A) ");
-    
-        System.out.println("\nInimigos no local: " + setorAtual.getInimigos().size());
-        for (int k = 0; k < setorAtual.getInimigos().size(); k++) {
-            Inimigo ini = setorAtual.getInimigos().get(k);
-            System.out.println("Vírus " + (k+1) + " -> ATK: " + ini.getAtk() + " | DEF: " + ini.getDef());
+    public void exibirInimigosdoSetor(TipodePersonagem player) {
+        // Imprime os inimigos do setor se eles existirem
+        Setor setorAtual = map[player.getPosX()][player.getPosY()];
+        int i = setorAtual.getInimigos().size();
+        if (i == 0) 
+            return;
+        else {
+            System.out.println("Inimigos no local: " + setorAtual.getInimigos().size());
+            for (int k = 0; k < setorAtual.getInimigos().size(); k++) {
+                Inimigo ini = setorAtual.getInimigos().get(k);
+                System.out.println("Vírus " + (k+1) + " -> ATK: " + ini.getAtk() + " | DEF: " + ini.getDef());
+            }
         }
     }
 }

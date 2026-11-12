@@ -8,8 +8,4 @@ public class SetorNormal extends Setor {
     public void aplicarRegraSetor(TipodePersonagem player) {
         System.out.println("Você está em um Setor Normal. Nenhuma restrição aplicada.");
     }
-    
-    public boolean podeProcurar() {
-        return true; 
-    }
 }
