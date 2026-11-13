@@ -39,6 +39,21 @@ public class JogadorSuporte extends Jogador {
         }
     }
 
+    /*
+
+       //p2 nao existe enquanto p1 nao existir
+    //se p1 derrotado, p2 tbm eh derrotado
+    //retorna true se p2 estava vivo e foi eliminado pela regra
+    public boolean eliminarSeParceiroMorto() {
+        if (!parceiro.estaVivo() && estaVivo()) {
+            setDef(0);
+            System.out.println(Cores.ANSI_RED + getNome() + " foi eliminado com " + parceiro.getNome() + Cores.ANSI_RESET);
+            return true;
+        }
+        return false;
+    }
+    */
+
     public void recDefesa(TipodePersonagem alvo) {
         alvo.setDef(alvo.getDef() + 2);
     }
