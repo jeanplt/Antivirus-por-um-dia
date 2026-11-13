@@ -3,7 +3,7 @@ import java.util.Scanner;
 public class Principal {
     public static void main(String[] args) {
         // Inicio do programa
-        System.out.println("\u001B[32m" + "Antivírus por um dia" + "\u001B[0m");
+        System.out.println(Cores.ANSI_GREEN + "Antivírus por um dia" + "\u001B[0m");
         Scanner scanner = new Scanner(System.in);
         // Load do Menu do jogo, sempre que acaba volta pra ele, pra sair tem que apertar 3
         while (true) {

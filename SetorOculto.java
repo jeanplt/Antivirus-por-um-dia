@@ -1,4 +1,3 @@
-import java.util.Random;
 public class SetorOculto extends Setor {
 
     public SetorOculto(int x, int y) {
@@ -7,8 +6,7 @@ public class SetorOculto extends Setor {
 
     @Override 
     public boolean ataqueAcertou() { // Define 50% de chance de acertar o golpe
-        Random aleatorio = new Random(); 
-        return aleatorio.nextBoolean(); 
+        return Aleatorio.booleano();
     }
 
     @Override

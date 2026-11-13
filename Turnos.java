@@ -40,18 +40,18 @@ public class Turnos {
         int idPlayer;
 
         if (playerDaVez instanceof JogadorSimples) {
-            corTurno = "\u001B[33m"; // Amarelo para P1
+            corTurno = Cores.ANSI_YELLOW ; // Amarelo para P1
             idPlayer = 1;
             tipoPlayer = "JOGADOR 1 (SIMPLES)";
         } else {
-            corTurno = "\u001B[34m"; // Azul para P2
+            corTurno = Cores.ANSI_BLUE; // Azul para P2
             idPlayer = 2;
             tipoPlayer = "JOGADOR 2 (SUPORTE)";
         }
 
         tabuleiro.exibirTabuleiro(player1, player2);
 
-        System.out.println(corTurno + "\n--- TURNO DO " + tipoPlayer + " ---" +"\u001B[0m");
+        System.out.println(corTurno + "\n--- TURNO DO " + tipoPlayer + " ---" + Cores.ANSI_RESET);
 
         tabuleiro.exibirStatusdoPlayer(playerDaVez);
         tabuleiro.exibirDetalhesdoSetor(playerDaVez);
@@ -66,7 +66,7 @@ public class Turnos {
                 char acao = scanner.next().charAt(0);
                 if (acao == 'W' || acao == 'w') { // Movimento para o NORTE (x - 1)
                     if (!setorAtual.getPortas()[0]) { // Porta Norte é o índice 0
-                        System.out.println("Movimento inválido! Há uma parede no caminho.");
+                        System.out.println(Cores.ANSI_RED + "Movimento inválido! Há uma parede no caminho." + Cores.ANSI_RESET);
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX() - 1, playerDaVez.getPosY());
                         playerDaVez.movimentar(destino);
@@ -75,7 +75,7 @@ public class Turnos {
                     }
                 } else if (acao == 'S' || acao == 's') { // Movimento para o SUL (x + 1)
                     if (!setorAtual.getPortas()[1]) { // Porta Sul é o índice 1
-                        System.out.println("Movimento inválido! Há uma parede no caminho.");
+                        System.out.println(Cores.ANSI_RED + "Movimento inválido! Há uma parede no caminho." + Cores.ANSI_RESET);
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX() + 1, playerDaVez.getPosY());
                         playerDaVez.movimentar(destino);
@@ -84,7 +84,7 @@ public class Turnos {
                     }
                 } else if (acao == 'D' || acao == 'd') { // Movimento para o LESTE (y + 1)
                     if (!setorAtual.getPortas()[2]) { // Porta Leste é o índice 2
-                        System.out.println("Movimento inválido! Há uma parede no caminho.");
+                        System.out.println(Cores.ANSI_RED + "Movimento inválido! Há uma parede no caminho." + Cores.ANSI_RESET);
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY() + 1);
                         playerDaVez.movimentar(destino);
@@ -93,7 +93,7 @@ public class Turnos {
                     }
                 } else if (acao == 'A' || acao == 'a') { // Movimento para o OESTE (y - 1)
                     if (!setorAtual.getPortas()[3]) { // Porta Oeste é o índice 3
-                        System.out.println("Movimento inválido! Há uma parede no caminho.");
+                        System.out.println(Cores.ANSI_RED + "Movimento inválido! Há uma parede no caminho." + Cores.ANSI_RESET);
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY() - 1);
                         playerDaVez.movimentar(destino);
@@ -101,7 +101,7 @@ public class Turnos {
                         movimentoValido = true;
                     }
                 } else { // Se comeu bola e digitou algum comando errado
-                    System.out.println("Movimento inválido, tente novamente uma das seguintes portas.");
+                    System.out.println(Cores.ANSI_RED + "Movimento inválido, tente novamente uma das seguintes portas." + Cores.ANSI_RESET);
                     tabuleiro.exibirPortasDisponiveis(playerDaVez);
                 }
                 // Aqui é pra sair da função caso tenha encontrado a fonte de infecção
@@ -144,7 +144,7 @@ public class Turnos {
             if (acao == 'P' || acao == 'p') { // Tenta procurar por itens no setor
                 // Verifica se é setor privado para impedir a procura
                 if (!setorAtual.podeProcurar()) {
-                    System.out.println("Ação Negada! Você está em um Setor Privado e não pode procurar itens aqui.");
+                    System.out.println(Cores.ANSI_RED + "Ação Negada! Você está em um Setor Privado e não pode procurar itens aqui." + Cores.ANSI_RESET);
                 } else {
                     playerDaVez.procurar(setorAtual);
                     quantidadeMovimento++;
@@ -162,13 +162,13 @@ public class Turnos {
                         if (setorAtual.ataqueAcertou()) { // Vê se o golpe vai pegar com 50% de chance (Oculto) ou 100% de chance (Demais)
                             playerDaVez.atacar(alvo);
                             playerDaVez.somaDanoAcumulado(idPlayer);
-                            System.out.println("P" + idPlayer + " acertou o ataque no vírus!");
+                            System.out.println(Cores.ANSI_GREEN + "P" + idPlayer + " acertou o ataque no vírus!" + Cores.ANSI_RESET);
                         } else {
-                            System.out.println("P" + idPlayer + " mirou no vírus, mas acertou na vazio!");
+                            System.out.println(Cores.ANSI_PURPLE + "P" + idPlayer + " mirou no vírus, mas acertou na vazio!" +Cores.ANSI_RESET) ;
                         }
                         if (alvo.getDef() <= 0) { // Verifica se o golpe derrotou o inimigo
                             setorAtual.getInimigos().remove(0);
-                            System.out.println("Um Vírus foi eliminado do setor!");
+                            System.out.println(Cores.ANSI_RED + "Um Vírus foi eliminado do setor!" + Cores.ANSI_RESET);
                         }
                     }
                     tabuleiro.exibirInimigosdoSetor(playerDaVez); 
@@ -179,7 +179,7 @@ public class Turnos {
                 int numPlayer = scanner.nextInt();
                 if (numPlayer == 1) {
                     if ((player1.getPosX() == player2.getPosX()) && (player1.getPosY() == player2.getPosY())) {
-                        System.out.println("P2 recuperou 2 de defesa para P1!");
+                        System.out.println(Cores.ANSI_CYAN + "P2 recuperou 2 de defesa para P1!" + Cores.ANSI_RESET);
                         ((JogadorSuporte) playerDaVez).recDefesa(player1);
                     } else {
                         System.out.println("P1 não está no mesmo setor de P2, logo P2 irá recuperar sua própria defesa em 2!");
@@ -189,7 +189,7 @@ public class Turnos {
                     ((JogadorSuporte) playerDaVez).recDefesa(player2);
                 quantidadeMovimento++;
             } else { // Se comeu bola e digitou algum comando errado
-                System.out.println("Ação inválida. Tente novamente.");
+                System.out.println(Cores.ANSI_RED + "Ação inválida. Tente novamente." + Cores.ANSI_RESET);
             }
             if (quantidadeMovimento == 1) { // Aqui é para lembrar o player que ele pode fazer mais uma ação
                 System.out.println("Você ainda pode realizar mais uma ação!");
@@ -202,15 +202,15 @@ public class Turnos {
         // Primeira parte para bater no P1
         Setor setorP1 = tabuleiro.getSetor(player1.getPosX(), player1.getPosY());
         if (!setorP1.getInimigos().isEmpty()) {
-            System.out.println("\n\u001B[31m--- Os vírus estão atacando o jogador simples (P1)! ---\u001B[0m");
+            System.out.println(Cores.ANSI_RED + "--- Os vírus estão atacando o jogador simples (P1)! ---" + Cores.ANSI_RESET);
             for (int i = 0; i < setorP1.getInimigos().size(); i++) {
                 Inimigo inimigo = setorP1.getInimigos().get(i);
                 int defesaAntes = player1.getDef(); 
                 inimigo.atacar(player1); 
                 if (player1.getDef() < defesaAntes) {
-                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa de P1 caiu para: " + player1.getDef());
+                    System.out.println(Cores.ANSI_RED + "- O Vírus " + (i+1) + " acertou o golpe! A defesa de P1 caiu para: " + player1.getDef() + Cores.ANSI_RESET);
                 } else {
-                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                    System.out.println(Cores.ANSI_GREEN + "- O Vírus " + (i+1) + " errou o ataque!" + Cores.ANSI_RESET) ;
                 }
                 // Comando só para mostrar com mais calma como foi o ataque dos inimigos a P1
                 try {
@@ -224,15 +224,15 @@ public class Turnos {
         // A pancada agora vai para as costas do P2
         Setor setorP2 = tabuleiro.getSetor(player2.getPosX(), player2.getPosY());
         if (!setorP2.getInimigos().isEmpty()) {
-            System.out.println("\n\u001B[31m--- Agora os vírus estão atacando o jogador suporte (P2)! ---\u001B[0m");
+            System.out.println(Cores.ANSI_RED + "--- Agora os vírus estão atacando o jogador suporte (P2)! ---" + Cores.ANSI_RESET);
             for (int i = 0; i < setorP2.getInimigos().size(); i++) {
                 Inimigo inimigo = setorP2.getInimigos().get(i);
                 int defesaAntes = player2.getDef();
                 inimigo.atacar(player2); 
                 if (player2.getDef() < defesaAntes) {
-                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa do P2 caiu para: " + player2.getDef());
+                    System.out.println(Cores.ANSI_RED + "- O Vírus " + (i+1) + " acertou o golpe! A defesa do P2 caiu para: " + player2.getDef() + Cores.ANSI_RESET );
                 } else {
-                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                    System.out.println(Cores.ANSI_GREEN + "- O Vírus " + (i+1) + " errou o ataque!" + Cores.ANSI_RESET);
                 }
                 // Mais uma pausa agora para mostrar também os ataques ao P2
                 try {
@@ -251,21 +251,21 @@ public class Turnos {
     public boolean verificarFimdeJogo() { 
         // colocar 25 dps
         if (cicloAtual > 5) { 
-            System.out.println("O ciclo limite de jogo foi excedido! Encerrando a partida.");
+            System.out.println(Cores.ANSI_RED + "O ciclo limite de jogo foi excedido! Encerrando a partida."  + Cores.ANSI_RESET);
             return true;
         }
         if (player1.getDef() <= 0) {
-            System.out.println("O jogador simples foi derrotado! Encerrando a partida.");
+            System.out.println(Cores.ANSI_RED + "O jogador simples foi derrotado! Encerrando a partida." + Cores.ANSI_RESET);
             return true;
         }
         int infecX = tabuleiro.getFonteInfecX();
         int infecY = tabuleiro.getFonteInfecY();
         if (player1.getPosX() == infecX && player1.getPosY() == infecY) {
-            System.out.println("\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida.");
+            System.out.println(Cores.ANSI_GREEN + "\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida." + Cores.ANSI_RESET);
             return true;
         }
         if (player2.getPosX() == infecX && player2.getPosY() == infecY) {
-            System.out.println("\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida.");
+            System.out.println(Cores.ANSI_GREEN + "\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida." + Cores.ANSI_RESET);
             return true;
         }
         return false;

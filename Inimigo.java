@@ -4,8 +4,7 @@ public class Inimigo extends TipodePersonagem {
 
     public Inimigo() {
         super(0, 0); 
-        Random aleatorio = new Random(); 
-        int statusAleatorio = aleatorio.nextInt(3) + 1; 
+        int statusAleatorio = Aleatorio.entre(1, 3);
         this.setAtk(statusAleatorio);
         this.setDef(statusAleatorio);
     }
@@ -13,7 +12,7 @@ public class Inimigo extends TipodePersonagem {
     @Override
     public void atacar(TipodePersonagem alvo) {
         Random aleatorio = new Random(); 
-        int chance = aleatorio.nextInt(6) + 1; 
+        int chance = Aleatorio.d6();
         
         if (chance % 2 == 0) { 
             alvo.setDef(alvo.getDef() - this.getAtk());

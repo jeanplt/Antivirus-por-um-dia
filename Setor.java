@@ -1,5 +1,4 @@
 import java.util.ArrayList;
-import java.util.Random;
 
 public abstract class Setor {
     private int x;
@@ -46,8 +45,7 @@ public abstract class Setor {
 
     public void gerarInimigos() {
         if (!this.visitado) {
-            Random aleatorio = new Random(); 
-            int qtdInimigos = aleatorio.nextInt(3) + 1;         
+            int qtdInimigos = Aleatorio.entre(0, 2);         
             for (int i = 0; i < qtdInimigos; i++) {
                 this.inimigos.add(new Inimigo());
             }

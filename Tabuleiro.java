@@ -101,79 +101,36 @@ public class Tabuleiro {
         // Matriz auxiliar para marcar por onde o algoritmo já passou e evitar loops infinitos
         boolean[][] visitados = new boolean[5][5];
         Queue<int[]> fila = new LinkedList<>();
-
-        /* DEBUG apagar dps
-        int[][][] pai = new int[5][5][2]; 
-        for (int i = 0; i < 5; i++) {
-            for (int j = 0; j < 5; j++) {
-                pai[i][j][0] = -1; // Inicializa vazio
-                pai[i][j][1] = -1;
-            }
-        }   
-        */
-
         // Inicia a busca pela coordenada de origem [2, 2]
         fila.add(new int[]{startX, startY});
         visitados[startX][startY] = true;
-
         // Vetores de movimento mapeados para sua ordem: 0=Norte, 1=Sul, 2=Leste, 3=Oeste
-        // Movimentos em X (linhas) e Y (colunas)
         int[] movX = {-1, 1, 0, 0}; 
         int[] movY = {0, 0, 1, -1};
-
         // Laço que valida o caminho
         while (!fila.isEmpty()) {
             int[] atual = fila.poll();
             int currX = atual[0];
             int currY = atual[1];
-
             // Se a posição atual for igual a da infecção, o caminho é válido!
             if (currX == targetX && currY == targetY) {
-                /* DEBUG apagar dps
-                java.util.ArrayList<String> caminho = new java.util.ArrayList<>();
-                int pX = targetX;
-                int pY = targetY;
-            
-                // Retorna o caminho
-                while (pX != startX || pY != startY) {
-                    caminho.add("[" + pX + "," + pY + "]");
-                    int tempX = pai[pX][pY][0];
-                    int tempY = pai[pX][pY][1];
-                    pX = tempX;
-                    pY = tempY;
-                }
-                caminho.add("[" + startX + "," + startY + "]"); // Adiciona o centro
-            
-                java.util.Collections.reverse(caminho); // Inverte para mostrar do início ao fim
-            
-                System.out.println("Caminho validado p/ Infecção: " + String.join(" -> ", caminho));
-                */
                 return true;
             }
-
             Setor setorAtual = map[currX][currY];
-
             // Testa as 4 direções ao redor do setor atual
             for (int dir = 0; dir < 4; dir++) {
-                
                 // Verifica se a porta nesta direção (dir) é 'true' (aberta)
                 if (setorAtual.getPortas()[dir]) {
                     int nextX = currX + movX[dir];
                     int nextY = currY + movY[dir];
-
                     // Garante que o vizinho não sai do tabuleiro (0 a 4) e ainda não foi visitado
                     if (nextX >= 0 && nextX < 5 && nextY >= 0 && nextY < 5 && !visitados[nextX][nextY]) {
                         visitados[nextX][nextY] = true;
-                        /* DEBUG apagar dps
-                        pai[nextX][nextY][0] = currX;
-                        pai[nextX][nextY][1] = currY;
-                        */
                         fila.add(new int[]{nextX, nextY});
                     }
                 }
             }
         }
-    
         // Se a fila esvaziar e não achar o X, tem que recriar o tabuleiro
         return false;
     }
@@ -190,13 +147,13 @@ public class Tabuleiro {
                     System.out.print("[ P ] "); 
                 } else if ((p1.getPosX() == i && p1.getPosY() == j)) {
                     System.out.print("[P1 ] "); 
-                } else if ((p2.getPosX() == i && p2.getPosY() == j)) {
+                } else if ((p2.getPosX() == i && p2.getPosY() == j) && (p2.getDef() > 0)) {
                     System.out.print("[P2 ] "); 
                 } else if (i == 2 && j == 2) {
                     System.out.print("[ C ] "); 
-                } else if (i == fonteInfecX && j == fonteInfecY) {
+                } /* else if (i == fonteInfecX && j == fonteInfecY) {
                     System.out.print("[ X ] "); 
-                } else {
+                } */ else {
                     System.out.print("[   ] ");
                 }
             }
@@ -231,7 +188,7 @@ public class Tabuleiro {
         if (i == 0) 
             return;
         else {
-            System.out.println("Inimigos no local: " + setorAtual.getInimigos().size());
+            System.out.println("Vírus no local: " + setorAtual.getInimigos().size());
             for (int k = 0; k < setorAtual.getInimigos().size(); k++) {
                 Inimigo ini = setorAtual.getInimigos().get(k);
                 System.out.println("Vírus " + (k+1) + " -> ATK: " + ini.getAtk() + " | DEF: " + ini.getDef());

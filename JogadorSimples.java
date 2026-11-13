@@ -1,4 +1,3 @@
-import java.util.Random;
 
 public class JogadorSimples extends Jogador {
 
@@ -19,8 +18,7 @@ public class JogadorSimples extends Jogador {
 
     @Override
     public void procurar(Setor setorAtual) {
-        Random aleatorio = new Random(); 
-        int num = aleatorio.nextInt(6) + 1; 
+       int num = Aleatorio.d6();
         if (num < 4) {
             System.out.println("P1 vasculhou o setor, mas nada foi encontrado desta vez!");
         } else if (num == 4) {
