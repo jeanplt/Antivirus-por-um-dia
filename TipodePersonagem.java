@@ -13,28 +13,28 @@ public abstract class TipodePersonagem {
         return atk; 
     }
     
-    public void setAtk(int atk) { 
-        this.atk = atk; 
-    }
-    
     public int getDef() { 
         return def; 
     }
-    
-    public void setDef(int def) { 
-        this.def = def; 
-    }
-    
+
     public int getPosX() { 
         return posX; 
     }
     
-    public void setPosX(int posX) { 
-        this.posX = posX; 
-    }
-    
     public int getPosY() { 
         return posY; 
+    }
+
+    public void setAtk(int atk) { 
+        this.atk = atk; 
+    }
+
+    public void setDef(int def) { 
+        this.def = def; 
+    }
+    
+    public void setPosX(int posX) { 
+        this.posX = posX; 
     }
     
     public void setPosY(int posY) { 

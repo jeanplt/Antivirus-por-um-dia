@@ -36,16 +36,16 @@ public class Turnos {
 
         // Variáveis para tratar cor do turno do player e como chamá-lo (P1 ou P2)
         String corTurno;
-        String abreviacaoPlayer;
         String tipoPlayer;
+        int idPlayer;
 
         if (playerDaVez instanceof JogadorSimples) {
             corTurno = "\u001B[33m"; // Amarelo para P1
-            abreviacaoPlayer = "P1";
+            idPlayer = 1;
             tipoPlayer = "JOGADOR 1 (SIMPLES)";
         } else {
             corTurno = "\u001B[34m"; // Azul para P2
-            abreviacaoPlayer = "P2";
+            idPlayer = 2;
             tipoPlayer = "JOGADOR 2 (SUPORTE)";
         }
 
@@ -70,7 +70,7 @@ public class Turnos {
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX() - 1, playerDaVez.getPosY());
                         playerDaVez.movimentar(destino);
-                        System.out.println(abreviacaoPlayer + " se moveu para o Norte.");
+                        System.out.println("P" + idPlayer + " se moveu para o Norte.");
                         movimentoValido = true;
                     }
                 } else if (acao == 'S' || acao == 's') { // Movimento para o SUL (x + 1)
@@ -79,7 +79,7 @@ public class Turnos {
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX() + 1, playerDaVez.getPosY());
                         playerDaVez.movimentar(destino);
-                        System.out.println(abreviacaoPlayer + " se moveu para o Sul.");
+                        System.out.println("P" + idPlayer + " se moveu para o Sul.");
                         movimentoValido = true;
                     }
                 } else if (acao == 'D' || acao == 'd') { // Movimento para o LESTE (y + 1)
@@ -88,7 +88,7 @@ public class Turnos {
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY() + 1);
                         playerDaVez.movimentar(destino);
-                        System.out.println(abreviacaoPlayer + " se moveu para o Leste.");
+                        System.out.println("P" + idPlayer + " se moveu para o Leste.");
                         movimentoValido = true;
                     }
                 } else if (acao == 'A' || acao == 'a') { // Movimento para o OESTE (y - 1)
@@ -97,7 +97,7 @@ public class Turnos {
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY() - 1);
                         playerDaVez.movimentar(destino);
-                        System.out.println(abreviacaoPlayer + " se moveu para o Oeste.");
+                        System.out.println("P" + idPlayer + " se moveu para o Oeste.");
                         movimentoValido = true;
                     }
                 } else { // Se comeu bola e digitou algum comando errado
@@ -152,17 +152,24 @@ public class Turnos {
             } else if (acao == 'E' || acao == 'e') { // Tenta atacar inimigos no setor
                 if (setorAtual.getInimigos().isEmpty()) {
                     System.out.println("Não há vírus neste setor para atacar.");
-                } else { // Pega sempre o primeiro inimigo da lista para atacar
-                    Inimigo alvo = setorAtual.getInimigos().get(0);
-                    if (setorAtual.ataqueAcertou()) { // Vê se o golpe vai pegar com 50% de chance (Oculto) ou 100% de chance (Demais)
-                        playerDaVez.atacar(alvo);
-                        System.out.println(abreviacaoPlayer + " acertou o ataque no vírus!");
-                    } else {
-                        System.out.println(abreviacaoPlayer + " mirou no vírus, mas acertou na vazio!");
-                    }
-                    if (alvo.getDef() <= 0) { // Verifica se o golpe derrotou o inimigo
-                        setorAtual.getInimigos().remove(0);
-                        System.out.println("Um Vírus foi eliminado do setor!");
+                } else { // Pega sempre o primeiro inimigo da lista para atacar, mas antes verifica se P2 não vai passar o dano
+                    int danoP1 = player1.getDanoAcumulado();
+                    int danoP2 = player2.getDanoAcumulado();
+                    if (idPlayer == 2 && danoP1 == danoP2) {
+                        System.out.println("P2 não pode ultrapassar o dano de P1, logo P2 perdeu a ação de ataque!");    
+                    } else { // Aqui é para o player que pode atacar, aí só verifica se ele vai acertar ou não o golpe
+                        Inimigo alvo = setorAtual.getInimigos().get(0);
+                        if (setorAtual.ataqueAcertou()) { // Vê se o golpe vai pegar com 50% de chance (Oculto) ou 100% de chance (Demais)
+                            playerDaVez.atacar(alvo);
+                            playerDaVez.somaDanoAcumulado(idPlayer);
+                            System.out.println("P" + idPlayer + " acertou o ataque no vírus!");
+                        } else {
+                            System.out.println("P" + idPlayer + " mirou no vírus, mas acertou na vazio!");
+                        }
+                        if (alvo.getDef() <= 0) { // Verifica se o golpe derrotou o inimigo
+                            setorAtual.getInimigos().remove(0);
+                            System.out.println("Um Vírus foi eliminado do setor!");
+                        }
                     }
                     tabuleiro.exibirInimigosdoSetor(playerDaVez); 
                     quantidadeMovimento++;
@@ -192,7 +199,53 @@ public class Turnos {
 
     // Tem fazer isso aqui ainda
     public void carregarTurnosdosInimigos() { 
+        // Primeira parte para bater no P1
+        Setor setorP1 = tabuleiro.getSetor(player1.getPosX(), player1.getPosY());
+        if (!setorP1.getInimigos().isEmpty()) {
+            System.out.println("\n\u001B[31m--- Os vírus estão atacando o jogador simples (P1)! ---\u001B[0m");
+            for (int i = 0; i < setorP1.getInimigos().size(); i++) {
+                Inimigo inimigo = setorP1.getInimigos().get(i);
+                int defesaAntes = player1.getDef(); 
+                inimigo.atacar(player1); 
+                if (player1.getDef() < defesaAntes) {
+                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa de P1 caiu para: " + player1.getDef());
+                } else {
+                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                }
+                // Comando só para mostrar com mais calma como foi o ataque dos inimigos a P1
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        // A pancada agora vai para as costas do P2
+        Setor setorP2 = tabuleiro.getSetor(player2.getPosX(), player2.getPosY());
+        if (!setorP2.getInimigos().isEmpty()) {
+            System.out.println("\n\u001B[31m--- Agora os vírus estão atacando o jogador suporte (P2)! ---\u001B[0m");
+            for (int i = 0; i < setorP2.getInimigos().size(); i++) {
+                Inimigo inimigo = setorP2.getInimigos().get(i);
+                int defesaAntes = player2.getDef();
+                inimigo.atacar(player2); 
+                if (player2.getDef() < defesaAntes) {
+                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa do P2 caiu para: " + player2.getDef());
+                } else {
+                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                }
+                // Mais uma pausa agora para mostrar também os ataques ao P2
+                try {
+                    Thread.sleep(1500);
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        // Processa o fim do turno
         this.cicloAtual++;
+        System.out.println();
     }
 
     public boolean verificarFimdeJogo() { 
