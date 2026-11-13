@@ -7,7 +7,7 @@ public class Principal {
         Scanner scanner = new Scanner(System.in);
         // Load do Menu do jogo, sempre que acaba volta pra ele, pra sair tem que apertar 3
         while (true) {
-            System.out.println("Menu (selecione uma opção):");
+            System.out.println("\nMenu (selecione uma opção):");
             System.out.println("1) Iniciar Jogo");
             System.out.println("2) Controles");
             System.out.println("3) Sair");
@@ -25,6 +25,9 @@ public class Principal {
                         break;
                     }
                     jogo.carregarTurnodoPlayers(jogo.getPlayer2());
+                    if (jogo.verificarFimdeJogo()) {
+                        break;
+                    }
                     System.out.println("\n--- Turno dos Inimigos ---");
                     jogo.carregarTurnosdosInimigos();
                 }

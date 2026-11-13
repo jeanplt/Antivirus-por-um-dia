@@ -5,7 +5,7 @@ public class SetorNormal extends Setor {
     }
 
     @Override
-    public void aplicarRegraSetor(TipodePersonagem player) {
+    public void aplicarRegraSetor(Jogador player) {
         System.out.println("Você está em um Setor Normal. Nenhuma restrição aplicada.");
     }
 }

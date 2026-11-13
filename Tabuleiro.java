@@ -28,7 +28,7 @@ public class Tabuleiro {
         // Laço para gerar as paredes do mapa, posicionar a infecção e verificar se é possível chegar até ela a partir do centro
         while (!mapaValido) {
             gerarEstruturaAleatoria();
-            posicionarFonteDeInfeccao();
+            posicionarFonteInfeccao();
             mapaValido = validarCaminhoComBFS(2, 2, fonteInfecX, fonteInfecY);
         }
     }
@@ -88,7 +88,7 @@ public class Tabuleiro {
         map[2][1].setPorta(2, true); // Esquerda
     }
 
-    private void posicionarFonteDeInfeccao() {
+    private void posicionarFonteInfeccao() {
         Random aleatorio = new Random();
         // Só garante que a fonte de infecção não fique no centro
         do { 
@@ -203,7 +203,7 @@ public class Tabuleiro {
             System.out.println(); 
         }
     }
-    public void exiberPortasDisponiveis(Jogador player) {
+    public void exibirPortasDisponiveis(Jogador player) {
         // Mostra as portas para Player pode se movimentar durante seu turno
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
         System.out.print("Portas disponíveis: ");

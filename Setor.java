@@ -62,5 +62,5 @@ public abstract class Setor {
         return true; 
     }
 
-    public abstract void aplicarRegraSetor(TipodePersonagem player);
+    public abstract void aplicarRegraSetor(Jogador player);
 }

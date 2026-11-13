@@ -12,7 +12,7 @@ public class SetorOculto extends Setor {
     }
 
     @Override
-    public void aplicarRegraSetor(TipodePersonagem player) {
+    public void aplicarRegraSetor(Jogador player) {
         System.out.println("Este é um Setor Oculto. Seus ataques podem falhar.");
     }
 }

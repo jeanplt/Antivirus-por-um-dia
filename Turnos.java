@@ -59,13 +59,13 @@ public class Turnos {
 
         // Parte inicial para se movimentar caso não tenha inimigos no Setor
         Setor setorAtual = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY());
+        boolean movimentoValido = false;
         if (setorAtual.getInimigos().isEmpty()) {
-            tabuleiro.exiberPortasDisponiveis(playerDaVez);
-            boolean movimentoValido = false;
+            tabuleiro.exibirPortasDisponiveis(playerDaVez);
             while (!movimentoValido) {
                 char acao = scanner.next().charAt(0);
                 if (acao == 'W' || acao == 'w') { // Movimento para o NORTE (x - 1)
-                    if (!setorAtual.getPortas()[0]) { // Porta Sul é o índice 0
+                    if (!setorAtual.getPortas()[0]) { // Porta Norte é o índice 0
                         System.out.println("Movimento inválido! Há uma parede no caminho.");
                     } else {
                         Setor destino = tabuleiro.getSetor(playerDaVez.getPosX() - 1, playerDaVez.getPosY());
@@ -102,24 +102,26 @@ public class Turnos {
                     }
                 } else { // Se comeu bola e digitou algum comando errado
                     System.out.println("Movimento inválido, tente novamente uma das seguintes portas.");
-                    tabuleiro.exiberPortasDisponiveis(playerDaVez);
+                    tabuleiro.exibirPortasDisponiveis(playerDaVez);
                 }
                 // Aqui é pra sair da função caso tenha encontrado a fonte de infecção
                 if (playerDaVez.getPosX() == tabuleiro.getFonteInfecX() && playerDaVez.getPosY() == tabuleiro.getFonteInfecY())
                     return;
             }
-        }
-        // Atualiza a posição se ele saiu do setor que estava
-        setorAtual = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY());
-        if (!setorAtual.isVisitado()) {
-            setorAtual.gerarInimigos();
-            setorAtual.setVisitado(true);
+            // Atualiza a posição se ele saiu do setor que estava
+            setorAtual = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY());
+            if (!setorAtual.isVisitado()) {
+                setorAtual.gerarInimigos();
+                setorAtual.setVisitado(true);
+            }
         }
 
         // Imprime de novo o mapa com os detalhes com base na nova posição (se ele se moveu)
-        tabuleiro.exibirTabuleiro(player1, player2);
-        tabuleiro.exibirDetalhesdoSetor(playerDaVez);
-        tabuleiro.exibirInimigosdoSetor(playerDaVez);
+        if (movimentoValido) {
+            tabuleiro.exibirTabuleiro(player1, player2);
+            tabuleiro.exibirDetalhesdoSetor(playerDaVez);
+            tabuleiro.exibirInimigosdoSetor(playerDaVez);
+        }
 
         // Verifica se terá alguma ação disponível no setor que está
         if (setorAtual.getInimigos().isEmpty()) {
@@ -135,8 +137,8 @@ public class Turnos {
         while (quantidadeMovimento < 2) {
             // Verifica de novo (desta vez para a segunda ação), se não ficou sem nada para fazer no Setor
             if (setorAtual.getInimigos().isEmpty() && !setorAtual.podeProcurar()) {
-                        System.out.println("Não tem mais inimigos no setor privado, passando a vez.");
-                        return; 
+                System.out.println("Não tem mais inimigos no setor privado, passando a vez.");
+                return; 
             }
             char acao = scanner.next().charAt(0);
             if (acao == 'P' || acao == 'p') { // Tenta procurar por itens no setor
@@ -165,13 +167,14 @@ public class Turnos {
                     tabuleiro.exibirInimigosdoSetor(playerDaVez); 
                     quantidadeMovimento++;
                 }
-            } else if ((acao == 'R' || acao == 'r') && playerDaVez instanceof JogadorSuporte) {
+            } else if ((acao == 'R' || acao == 'r') && playerDaVez instanceof JogadorSuporte) { // Exclusivo P2, recupera defesa para si ou para P1
                 System.out.println("P2 decidiu recuperar 2 de Defesa, agora escolha para quem irá a ajuda (1 para P1 ou 2 para P2):");
                 int numPlayer = scanner.nextInt();
                 if (numPlayer == 1) {
-                    if ((player1.getPosX() == player2.getPosX()) && (player1.getPosY() == player2.getPosY()))
+                    if ((player1.getPosX() == player2.getPosX()) && (player1.getPosY() == player2.getPosY())) {
+                        System.out.println("P2 recuperou 2 de defesa para P1!");
                         ((JogadorSuporte) playerDaVez).recDefesa(player1);
-                    else {
+                    } else {
                         System.out.println("P1 não está no mesmo setor de P2, logo P2 irá recuperar sua própria defesa em 2!");
                         ((JogadorSuporte) playerDaVez).recDefesa(player2);
                     }
@@ -205,11 +208,11 @@ public class Turnos {
         int infecX = tabuleiro.getFonteInfecX();
         int infecY = tabuleiro.getFonteInfecY();
         if (player1.getPosX() == infecX && player1.getPosY() == infecY) {
-            System.out.println("O jogador simples encontrou a fonte da infecção! Encerrando a partida.");
+            System.out.println("\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida.");
             return true;
         }
         if (player2.getPosX() == infecX && player2.getPosY() == infecY) {
-            System.out.println("O jogador suporte encontrou a fonte da infecção! Encerrando a partida.");
+            System.out.println("\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida.");
             return true;
         }
         return false;
