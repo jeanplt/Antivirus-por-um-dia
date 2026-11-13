@@ -115,7 +115,6 @@ public class Turnos {
                 setorAtual.setVisitado(true);
             }
         }
-
         // Imprime de novo o mapa com os detalhes com base na nova posição (se ele se moveu)
         if (movimentoValido) {
             tabuleiro.exibirTabuleiro(player1, player2);
@@ -169,7 +168,10 @@ public class Turnos {
                         if (alvo.getDef() <= 0) { // Verifica se o golpe derrotou o inimigo
                             setorAtual.getInimigos().remove(0);
                             System.out.println("Um Vírus foi eliminado do setor!");
+                            if (setorAtual.getInimigos().isEmpty())
+                                System.out.println("Todos os vírus do setor foram eliminados!");
                         }
+                        System.out.println();
                     }
                     tabuleiro.exibirInimigosdoSetor(playerDaVez); 
                     quantidadeMovimento++;
@@ -203,14 +205,18 @@ public class Turnos {
         Setor setorP1 = tabuleiro.getSetor(player1.getPosX(), player1.getPosY());
         if (!setorP1.getInimigos().isEmpty()) {
             System.out.println("\n\u001B[31m--- Os vírus estão atacando o jogador simples (P1)! ---\u001B[0m");
+            System.out.println();
             for (int i = 0; i < setorP1.getInimigos().size(); i++) {
                 Inimigo inimigo = setorP1.getInimigos().get(i);
                 int defesaAntes = player1.getDef(); 
                 inimigo.atacar(player1); 
                 if (player1.getDef() < defesaAntes) {
-                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa de P1 caiu para: " + player1.getDef());
+                    System.out.println("O Vírus " + (i+1) + " acertou o golpe! A defesa de P1 caiu para: " + player1.getDef());
                 } else {
-                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                    System.out.println("O Vírus " + (i+1) + " errou o ataque!");
+                }
+                if (player1.getDef() <= 0 ) {
+                    return;
                 }
                 // Comando só para mostrar com mais calma como foi o ataque dos inimigos a P1
                 try {
@@ -220,19 +226,26 @@ public class Turnos {
                 }
             }
         }
-
+    
+        if(player2.getDef() <= 0 ) 
+            return;
         // A pancada agora vai para as costas do P2
         Setor setorP2 = tabuleiro.getSetor(player2.getPosX(), player2.getPosY());
         if (!setorP2.getInimigos().isEmpty()) {
             System.out.println("\n\u001B[31m--- Agora os vírus estão atacando o jogador suporte (P2)! ---\u001B[0m");
+            System.out.println();
             for (int i = 0; i < setorP2.getInimigos().size(); i++) {
+                if (player2.getDef() <= 0 ) {
+                    System.out.println("\nO jogador P2 foi derrotado!");
+                    return;
+                }
                 Inimigo inimigo = setorP2.getInimigos().get(i);
                 int defesaAntes = player2.getDef();
                 inimigo.atacar(player2); 
                 if (player2.getDef() < defesaAntes) {
-                    System.out.println("- O Vírus " + (i+1) + " acertou o golpe! A defesa do P2 caiu para: " + player2.getDef());
+                    System.out.println("O Vírus " + (i+1) + " acertou o golpe! A defesa do P2 caiu para: " + player2.getDef());
                 } else {
-                    System.out.println("- O Vírus " + (i+1) + " errou o ataque!");
+                    System.out.println("O Vírus " + (i+1) + " errou o ataque!");
                 }
                 // Mais uma pausa agora para mostrar também os ataques ao P2
                 try {
@@ -249,23 +262,22 @@ public class Turnos {
     }
 
     public boolean verificarFimdeJogo() { 
-        // colocar 25 dps
-        if (cicloAtual > 5) { 
-            System.out.println("O ciclo limite de jogo foi excedido! Encerrando a partida.");
-            return true;
-        }
-        if (player1.getDef() <= 0) {
-            System.out.println("O jogador simples foi derrotado! Encerrando a partida.");
-            return true;
-        }
         int infecX = tabuleiro.getFonteInfecX();
         int infecY = tabuleiro.getFonteInfecY();
-        if (player1.getPosX() == infecX && player1.getPosY() == infecY) {
+        if (player1.getPosX() == infecX && player1.getPosY() == infecY) { // Caso P1 acha a fonte
             System.out.println("\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida.");
             return true;
         }
-        if (player2.getPosX() == infecX && player2.getPosY() == infecY) {
+        if (player2.getPosX() == infecX && player2.getPosY() == infecY) { // Caso P2 acha a fonte
             System.out.println("\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida.");
+            return true;
+        }
+        if (cicloAtual > 25) { // Caso O limite de ciclos exceda
+            System.out.println("O ciclo limite de jogo foi excedido! Encerrando a partida.");
+            return true;
+        }
+        if (player1.getDef() <= 0) { // Caso o P1 tenha sido derrotado
+            System.out.println("O jogador simples foi derrotado! Encerrando a partida.");
             return true;
         }
         return false;

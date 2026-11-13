@@ -18,15 +18,19 @@ public class Principal {
                 System.out.println("\u001B[32m" + "Iniciando Antivírus por um dia..." + "\u001B[0m"); 
                 Turnos jogo = new Turnos();
                 jogo.iniciarJogo();
-                while (!jogo.verificarFimdeJogo()) {
+                while (!jogo.verificarFimdeJogo()) { // Itera o laço enquanto nenhuma das condições de fim de jogo forem satisfeitas
                     System.out.println("\n--- Turno Atual: " + jogo.getCicloAtual() + " ---");
                     jogo.carregarTurnodoPlayers(jogo.getPlayer1());
-                    if (jogo.verificarFimdeJogo()) {
+                    if (jogo.verificarFimdeJogo()) { // Verifica se o fim do turno de P1 ocasionou o fim da partida
                         break;
-                    }
-                    jogo.carregarTurnodoPlayers(jogo.getPlayer2());
-                    if (jogo.verificarFimdeJogo()) {
-                        break;
+                    } 
+                    if (jogo.getPlayer2().getDef() <= 0) { // Verifica se P2 foi derrotado para não ter mais turnos para ele
+                        System.out.println("\nComo P2 foi derrotado, ele não participa mais do jogo!");
+                    } else {
+                        jogo.carregarTurnodoPlayers(jogo.getPlayer2());
+                        if (jogo.verificarFimdeJogo()) {
+                            break;
+                        }
                     }
                     System.out.println("\n--- Turno dos Inimigos ---");
                     jogo.carregarTurnosdosInimigos();
@@ -34,7 +38,7 @@ public class Principal {
                 System.out.println("\nFim de jogo!");
                 break;
             case 2: // Mostra só controles e volta pro Menu apertando qualquer coisa
-                System.out.println("\u001B[32m" + "Controles do jogo:" + "\u001B[0m");
+                System.out.println("\u001B[32m" + "\nControles do jogo:" + "\u001B[0m");
                 System.out.println("Movimentação: W(cima), A(esquerda), S(baixo), D(direita)");
                 System.out.println("Ataque: E");
                 System.out.println("Procurar: P");

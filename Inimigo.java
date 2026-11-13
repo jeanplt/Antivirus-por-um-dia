@@ -14,7 +14,6 @@ public class Inimigo extends TipodePersonagem {
     public void atacar(TipodePersonagem alvo) {
         Random aleatorio = new Random(); 
         int chance = aleatorio.nextInt(6) + 1; 
-        
         if (chance % 2 == 0) { 
             alvo.setDef(alvo.getDef() - this.getAtk());
         }
