@@ -1,6 +1,6 @@
 import java.util.Random;
 
-public class JogadorSuporte extends TipodePersonagem implements AcoesExploracao {
+public class JogadorSuporte extends Jogador {
 
     public JogadorSuporte() {
         super(1, 7);
@@ -18,19 +18,28 @@ public class JogadorSuporte extends TipodePersonagem implements AcoesExploracao 
     }
 
     @Override
-    public void procurar() {
+    public void procurar(Setor setorAtual) {
         Random aleatorio = new Random(); 
         int num = aleatorio.nextInt(6) + 1; 
-        if (num == 4) {
+        if (num < 4) {
+            System.out.println("P2 vasculhou o setor, mas nada foi encontrado desta vez!");
+        } else if (num == 4) {
+            System.out.println("P2 encontrou alguns tokens de segurança e obteve mais 1 de Defesa!");
             this.setDef(this.getDef() + 1); 
         } else if (num == 5) {
-            this.setDef(this.getDef() + 2); 
+            System.out.println("P2 encontrou vários tokens de segurança e obteve mais 2 de Defesa!");
+            this.setDef(this.getDef() + 2);
+        } else {
+            System.out.println("P2 encontrou um Firewall poderoso! Se existir vírus do setor, todos eles perdem 1 de Defesa!");
+            for (int i = 0; i < setorAtual.getInimigos().size(); i++) {
+                Inimigo inimigo = setorAtual.getInimigos().get(i);
+                inimigo.setDef(inimigo.getDef() - 1);
+            }
+            setorAtual.getInimigos().removeIf(ini -> ini.getDef() <= 0);
         }
     }
 
-    // Habilidade especial exclusiva do jogador de suporte[cite: 11, 18]
     public void recDefesa(TipodePersonagem alvo) {
-        // Adiciona 2 à defesa do alvo escolhido (ele mesmo ou P1)[cite: 11, 13]
         alvo.setDef(alvo.getDef() + 2);
     }
 }
