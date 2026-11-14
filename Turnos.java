@@ -264,15 +264,15 @@ public class Turnos {
     public boolean verificarFimdeJogo() { 
         int infecX = tabuleiro.getFonteInfecX();
         int infecY = tabuleiro.getFonteInfecY();
-        if (player1.getPosX() == infecX && player1.getPosY() == infecY) { // Caso P1 acha a fonte
+        if (player1.getPosX() == infecX && player1.getPosY() == infecY) { // Caso P1 ache a fonte
             System.out.println("\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida.");
             return true;
         }
-        if (player2.getPosX() == infecX && player2.getPosY() == infecY) { // Caso P2 acha a fonte
+        if (player2.getPosX() == infecX && player2.getPosY() == infecY) { // Caso P2 ache a fonte
             System.out.println("\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida.");
             return true;
         }
-        if (cicloAtual > 25) { // Caso O limite de ciclos exceda
+        if (cicloAtual > 25) { // Caso o limite de ciclos exceda
             System.out.println("O ciclo limite de jogo foi excedido! Encerrando a partida.");
             return true;
         }
