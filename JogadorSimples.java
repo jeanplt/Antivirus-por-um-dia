@@ -1,21 +1,24 @@
 
 public class JogadorSimples extends Jogador {
-
+    // Construtor do jogador simples definido com atk=2 e def=6
     public JogadorSimples() {
         super(2, 6); 
     }
 
+    // Ataque do P1
     @Override
     public void atacar(TipodePersonagem alvo) {
         alvo.setDef(alvo.getDef() - this.getAtk());
     }
 
+    // Movimento do P1
     @Override
     public void movimentar(Setor destino) {
         this.setPosX(destino.getX());
         this.setPosY(destino.getY());
     }
 
+    // Procura do P1
     @Override
     public void procurar(Setor setorAtual) {
        int num = Aleatorio.d6();

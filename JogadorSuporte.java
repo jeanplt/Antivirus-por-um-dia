@@ -1,22 +1,25 @@
 import java.util.Random;
 
 public class JogadorSuporte extends Jogador {
-
+    // Construtor do jogador suporte definido com atk=1 e def=7
     public JogadorSuporte() {
         super(1, 7);
     }
 
+    // Ataque do P2
     @Override
     public void atacar(TipodePersonagem alvo) {
         alvo.setDef(alvo.getDef() - this.getAtk()); 
     }
 
+    // Movimento do P2
     @Override
     public void movimentar(Setor destino) {
         this.setPosX(destino.getX());
         this.setPosY(destino.getY());
     }
 
+    // Procura do P2
     @Override
     public void procurar(Setor setorAtual) {
         Random aleatorio = new Random(); 
@@ -39,21 +42,7 @@ public class JogadorSuporte extends Jogador {
         }
     }
 
-    /*
-
-       //p2 nao existe enquanto p1 nao existir
-    //se p1 derrotado, p2 tbm eh derrotado
-    //retorna true se p2 estava vivo e foi eliminado pela regra
-    public boolean eliminarSeParceiroMorto() {
-        if (!parceiro.estaVivo() && estaVivo()) {
-            setDef(0);
-            System.out.println(Cores.ANSI_RED + getNome() + " foi eliminado com " + parceiro.getNome() + Cores.ANSI_RESET);
-            return true;
-        }
-        return false;
-    }
-    */
-
+    // Recupera defesa (habilidade exclusiva de P2)
     public void recDefesa(TipodePersonagem alvo) {
         alvo.setDef(alvo.getDef() + 2);
     }

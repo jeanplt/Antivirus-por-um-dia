@@ -7,22 +7,27 @@ public class Tabuleiro {
     private int fonteInfecX; 
     private int fonteInfecY; 
 
+    // Construtor do tabuleiro com matriz 5x5 de Setores
     public Tabuleiro() {
         map = new Setor[5][5];
     }
 
+    // Get do setor no tabuleiro pelas coordenadas
     public Setor getSetor(int x, int y) {
         return map[x][y];
     }
 
+    // Get da coordenada X da fonte de infecção
     public int getFonteInfecX() {
         return this.fonteInfecX;
     }
 
+    // Get da coordenada Y da fonte de infecção
     public int getFonteInfecY() {
         return this.fonteInfecY;
     }
 
+    // Método gerador do tabuleiro
     public void iniciarTabuleiro() {
         boolean mapaValido = false;
         // Laço para gerar as paredes do mapa, posicionar a infecção e verificar se é possível chegar até ela a partir do centro
@@ -33,6 +38,7 @@ public class Tabuleiro {
         }
     }
 
+    // Método para estrutura aleatória do mapa
     private void gerarEstruturaAleatoria() {
         Random aleatorio = new Random();
         // Mapeamento dos Setores: 
@@ -63,24 +69,20 @@ public class Tabuleiro {
         // Novo laço agora para definir as portas para os setores
         for (int i = 0; i < 5; i++) {
             for (int j = 0; j < 5; j++) {
-                // Norte (0)
-                if (i > 0) map[i][j].setPorta(0, aleatorio.nextBoolean());
-                // Sul (1)
-                if (i < 4) map[i][j].setPorta(1, aleatorio.nextBoolean());
-                // Leste (2)
-                if (j < 4) map[i][j].setPorta(2, aleatorio.nextBoolean());
-                // Oeste (3)
-                if (j > 0) map[i][j].setPorta(3, aleatorio.nextBoolean());
-                // Sincronizar portas adjacentes para consistência arquitetural
+                if (i > 0) map[i][j].setPorta(0, aleatorio.nextBoolean()); // Norte (0)
+                if (i < 4) map[i][j].setPorta(1, aleatorio.nextBoolean()); // Sul (1)
+                if (j < 4) map[i][j].setPorta(2, aleatorio.nextBoolean()); // Leste (2)
+                if (j > 0) map[i][j].setPorta(3, aleatorio.nextBoolean()); // Oeste (3)
+                // Sincroniza portas adjacentes 
                 if (i > 0) map[i-1][j].setPorta(1, map[i][j].getPortas()[0]);
                 if (j > 0) map[i][j-1].setPorta(2, map[i][j].getPortas()[3]);
             }
         }
         // Força existir 4 portas no centro
-        map[2][2].setPorta(0, true); // Norte
-        map[2][2].setPorta(1, true); // Sul
-        map[2][2].setPorta(2, true); // Leste
-        map[2][2].setPorta(3, true); // Oeste
+        map[2][2].setPorta(0, true); 
+        map[2][2].setPorta(1, true); 
+        map[2][2].setPorta(2, true); 
+        map[2][2].setPorta(3, true); 
         // Força existir 4 portas adjacentes ao centro
         map[1][2].setPorta(1, true); // De cima
         map[2][3].setPorta(3, true); // Direita
@@ -88,15 +90,16 @@ public class Tabuleiro {
         map[2][1].setPorta(2, true); // Esquerda
     }
 
+    // Método de posicionamento da fonte de infecção
     private void posicionarFonteInfeccao() {
         Random aleatorio = new Random();
-        // Só garante que a fonte de infecção não fique no centro
-        do { 
+        do { // Só garante que a fonte de infecção não fique no centro
             fonteInfecX = aleatorio.nextInt(5);
             fonteInfecY = aleatorio.nextInt(5);
         } while (fonteInfecX == 2 && fonteInfecY == 2); 
     }
 
+    // Algoritmo de Busca em Largura
     private boolean validarCaminhoComBFS(int startX, int startY, int targetX, int targetY) {
         // Matriz auxiliar para marcar por onde o algoritmo já passou e evitar loops infinitos
         boolean[][] visitados = new boolean[5][5];
@@ -135,6 +138,7 @@ public class Tabuleiro {
         return false;
     }
 
+    // Método para imprimir o tabuleiro
     public void exibirTabuleiro(JogadorSimples p1, JogadorSuporte p2) {
         // Tabela para impressão do mapa
         System.out.println("\n--- Mapa do Sistema ---");
@@ -142,7 +146,7 @@ public class Tabuleiro {
         for (int i = 0; i < 5; i++) {
             System.out.print((i + 1) + " ");
             for (int j = 0; j < 5; j++) {
-                // Imprime jogadores no mapa, acho que é pra tirar a fonte depois
+                // Imprime jogadores no mapa
                 if ((p1.getPosX() == i && p1.getPosY() == j) && (p2.getPosX() == i && p2.getPosY() == j)) {
                     System.out.print("[ P ] "); 
                 } else if ((p1.getPosX() == i && p1.getPosY() == j)) {
@@ -160,6 +164,8 @@ public class Tabuleiro {
             System.out.println(); 
         }
     }
+
+    // Método para imprimir portas disponíveis no setor que o player está
     public void exibirPortasDisponiveis(Jogador player) {
         // Mostra as portas para Player pode se movimentar durante seu turno
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
@@ -170,17 +176,19 @@ public class Tabuleiro {
         if (setorAtual.getPortas()[3]) System.out.print("Oeste(A) ");
     }
 
+    // Método para mostrar atk e def do player
     public void exibirStatusdoPlayer(Jogador player) {
         System.out.println("\nAtaque/Defesa do Personagem: " + (player.getAtk()) + "/" + (player.getDef()));
     }
 
+    // Método para mostrar regras do setor que o player está
     public void exibirDetalhesdoSetor(Jogador player) {
-        // Imprime os dados do Setor Atual do player
         Setor setorAtual = map[player.getPosX()][player.getPosY()];
         System.out.println("\n--- Detalhes do Setor [" + (player.getPosX() + 1) + "," + (player.getPosY() + 1) + "] ---");
         setorAtual.aplicarRegraSetor(player);
     }
 
+    // Método para mostrar quais inimigos estão no setor e seus status
     public void exibirInimigosdoSetor(Jogador player) {
         // Imprime os inimigos do setor se eles existirem
         Setor setorAtual = map[player.getPosX()][player.getPosY()];

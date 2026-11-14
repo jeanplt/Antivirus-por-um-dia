@@ -1,5 +1,5 @@
-//colorir e estilizar saidas no terminal
-//secao 6.2
+// Colorir e estilizar saidas no terminal
+// secao 6.2
 
 
 public class Cores {

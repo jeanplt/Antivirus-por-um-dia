@@ -6,6 +6,7 @@ public class Turnos {
     private JogadorSuporte player2; 
     private Tabuleiro tabuleiro;
 
+    // Construtor do turno para contar os ciclos do jogo
     public Turnos() {
         this.cicloAtual = 0;
         this.player1 = new JogadorSimples();
@@ -13,33 +14,36 @@ public class Turnos {
         this.tabuleiro = new Tabuleiro();
     }
 
+    // Get do Ciclo atual
     public int getCicloAtual() {
         return this.cicloAtual;
     }
 
+    // Get do P1
     public JogadorSimples getPlayer1() {
         return this.player1;
     }
 
+
+    // Get do P2
     public JogadorSuporte getPlayer2() {
         return this.player2;
     }
 
+    // Método para iniciar o jogo
     public void iniciarJogo() {
         tabuleiro.iniciarTabuleiro();
         player1.setPosX(2); player1.setPosY(2);
         player2.setPosX(2); player2.setPosY(2);
     }
 
-    public void carregarTurnodoPlayers(Jogador playerDaVez) { 
-        Scanner scanner = new Scanner(System.in);
-
+    // Método para turno dos players
+    public void carregarTurnodoPlayers(Jogador playerDaVez, Scanner scanner) { 
         // Variáveis para tratar cor do turno do player e como chamá-lo (P1 ou P2)
         String corTurno;
         String tipoPlayer;
         int idPlayer;
-
-        if (playerDaVez instanceof JogadorSimples) {
+        if (playerDaVez instanceof JogadorSimples) { // Verifica quem é o player do turno para deixar as legendas e cores apropriadas
             corTurno = Cores.ANSI_YELLOW ; // Amarelo para P1
             idPlayer = 1;
             tipoPlayer = "JOGADOR 1 (SIMPLES)";
@@ -48,15 +52,11 @@ public class Turnos {
             idPlayer = 2;
             tipoPlayer = "JOGADOR 2 (SUPORTE)";
         }
-
         tabuleiro.exibirTabuleiro(player1, player2);
-
         System.out.println(corTurno + "\n--- TURNO DO " + tipoPlayer + " ---" + Cores.ANSI_RESET);
-
         tabuleiro.exibirStatusdoPlayer(playerDaVez);
         tabuleiro.exibirDetalhesdoSetor(playerDaVez);
         tabuleiro.exibirInimigosdoSetor(playerDaVez); 
-
         // Parte inicial para se movimentar caso não tenha inimigos no Setor
         Setor setorAtual = tabuleiro.getSetor(playerDaVez.getPosX(), playerDaVez.getPosY());
         boolean movimentoValido = false;
@@ -100,11 +100,11 @@ public class Turnos {
                         System.out.println("P" + idPlayer + " se moveu para o Oeste.");
                         movimentoValido = true;
                     }
-                } else { // Se comeu bola e digitou algum comando errado
+                } else { // Se digitou algum comando errado
                     System.out.println(Cores.ANSI_RED + "Movimento inválido, tente novamente uma das seguintes portas." + Cores.ANSI_RESET);
                     tabuleiro.exibirPortasDisponiveis(playerDaVez);
                 }
-                // Aqui é pra sair da função caso tenha encontrado a fonte de infecção
+                // Sai da função caso tenha encontrado a fonte de infecção
                 if (playerDaVez.getPosX() == tabuleiro.getFonteInfecX() && playerDaVez.getPosY() == tabuleiro.getFonteInfecY())
                     return;
             }
@@ -115,28 +115,30 @@ public class Turnos {
                 setorAtual.setVisitado(true);
             }
         }
-
         // Imprime de novo o mapa com os detalhes com base na nova posição (se ele se moveu)
         if (movimentoValido) {
             tabuleiro.exibirTabuleiro(player1, player2);
             tabuleiro.exibirDetalhesdoSetor(playerDaVez);
             tabuleiro.exibirInimigosdoSetor(playerDaVez);
         }
-
         // Verifica se terá alguma ação disponível no setor que está
         if (setorAtual.getInimigos().isEmpty()) {
             if (setorAtual instanceof SetorPrivado) {
-                System.out.println("\nNão tem mais nenhum inimigo no setor privado, passando a vez.");
-                return; 
+                if (playerDaVez instanceof JogadorSimples) {
+                    System.out.println("\nNão tem mais nenhum vírus no setor privado, passando a vez.");
+                    return; 
+                } else {
+                    System.out.println("\nNão tem mais nenhum vírus no setor privado, mas você ainda pode recuperar defesa(R NP)!");
+                }
+            } else {
+                System.out.println("\nEste setor não tem mais inimigos, mas você ainda pode procurar(P) itens ou, se for P2, recuperar defesa(R NP)!");
             }
-            System.out.println("\nEste setor não tem mais inimigos, mas você ainda pode procurar(P) itens!");
         }
-
         // Laço para processar as duas ações
         int quantidadeMovimento = 0;
         while (quantidadeMovimento < 2) {
             // Verifica de novo (desta vez para a segunda ação), se não ficou sem nada para fazer no Setor
-            if (setorAtual.getInimigos().isEmpty() && !setorAtual.podeProcurar()) {
+            if (setorAtual.getInimigos().isEmpty() && !setorAtual.podeProcurar() && playerDaVez instanceof JogadorSimples) {
                 System.out.println("Não tem mais inimigos no setor privado, passando a vez.");
                 return; 
             }
@@ -157,9 +159,9 @@ public class Turnos {
                     int danoP2 = player2.getDanoAcumulado();
                     if (idPlayer == 2 && danoP1 == danoP2) {
                         System.out.println("P2 não pode ultrapassar o dano de P1, logo P2 perdeu a ação de ataque!");    
-                    } else { // Aqui é para o player que pode atacar, aí só verifica se ele vai acertar ou não o golpe
+                    } else { // Aqui é para o player que pode atacar, então verifica se ele vai acertar ou não o golpe
                         Inimigo alvo = setorAtual.getInimigos().get(0);
-                        if (setorAtual.ataqueAcertou()) { // Vê se o golpe vai pegar com 50% de chance (Oculto) ou 100% de chance (Demais)
+                        if (setorAtual.ataqueAcertou()) { // Vê se o golpe vai acertar com 50% de chance (Oculto) ou 100% de chance (Demais)
                             playerDaVez.atacar(alvo);
                             playerDaVez.somaDanoAcumulado(idPlayer);
                             System.out.println(Cores.ANSI_GREEN + "P" + idPlayer + " acertou o ataque no vírus!" + Cores.ANSI_RESET);
@@ -169,7 +171,10 @@ public class Turnos {
                         if (alvo.getDef() <= 0) { // Verifica se o golpe derrotou o inimigo
                             setorAtual.getInimigos().remove(0);
                             System.out.println(Cores.ANSI_RED + "Um Vírus foi eliminado do setor!" + Cores.ANSI_RESET);
+                            if (setorAtual.getInimigos().isEmpty())
+                                System.out.println("Todos os vírus do setor foram eliminados!");
                         }
+                        System.out.println();
                     }
                     tabuleiro.exibirInimigosdoSetor(playerDaVez); 
                     quantidadeMovimento++;
@@ -188,16 +193,16 @@ public class Turnos {
                 } else
                     ((JogadorSuporte) playerDaVez).recDefesa(player2);
                 quantidadeMovimento++;
-            } else { // Se comeu bola e digitou algum comando errado
+            } else { // Se digitou algum comando errado
                 System.out.println(Cores.ANSI_RED + "Ação inválida. Tente novamente." + Cores.ANSI_RESET);
             }
-            if (quantidadeMovimento == 1) { // Aqui é para lembrar o player que ele pode fazer mais uma ação
+            if (quantidadeMovimento == 1) { // Para lembrar o player que ele pode fazer mais uma ação
                 System.out.println("Você ainda pode realizar mais uma ação!");
             }
         }
     }
 
-    // Tem fazer isso aqui ainda
+    // Método para turnos de ataque dos inimigos
     public void carregarTurnosdosInimigos() { 
         // Primeira parte para bater no P1
         Setor setorP1 = tabuleiro.getSetor(player1.getPosX(), player1.getPosY());
@@ -212,20 +217,28 @@ public class Turnos {
                 } else {
                     System.out.println(Cores.ANSI_GREEN + "- O Vírus " + (i+1) + " errou o ataque!" + Cores.ANSI_RESET) ;
                 }
-                // Comando só para mostrar com mais calma como foi o ataque dos inimigos a P1
-                try {
+                if (player1.getDef() <= 0 ) {
+                    return;
+                }
+                try { // Comando só para mostrar com mais calma como foi o ataque dos inimigos a P1
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
         }
-
-        // A pancada agora vai para as costas do P2
+        if(player2.getDef() <= 0 ) 
+            return;
+        // Segunda parte do turno dos inimigos para o P2
+        System.out.println();
         Setor setorP2 = tabuleiro.getSetor(player2.getPosX(), player2.getPosY());
         if (!setorP2.getInimigos().isEmpty()) {
             System.out.println(Cores.ANSI_RED + "--- Agora os vírus estão atacando o jogador suporte (P2)! ---" + Cores.ANSI_RESET);
             for (int i = 0; i < setorP2.getInimigos().size(); i++) {
+                if (player2.getDef() <= 0 ) {
+                    System.out.println("\nO jogador P2 foi derrotado!");
+                    return;
+                }
                 Inimigo inimigo = setorP2.getInimigos().get(i);
                 int defesaAntes = player2.getDef();
                 inimigo.atacar(player2); 
@@ -234,38 +247,36 @@ public class Turnos {
                 } else {
                     System.out.println(Cores.ANSI_GREEN + "- O Vírus " + (i+1) + " errou o ataque!" + Cores.ANSI_RESET);
                 }
-                // Mais uma pausa agora para mostrar também os ataques ao P2
-                try {
+                try { // Mais uma pausa agora para mostrar também os ataques ao P2
                     Thread.sleep(1500);
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                 }
             }
         }
-
         // Processa o fim do turno
         this.cicloAtual++;
         System.out.println();
     }
 
+    // Método que verifica o fim de jogo com bae na ordem que está no enunciado do trabalho
     public boolean verificarFimdeJogo() { 
-        // colocar 25 dps
-        if (cicloAtual > 5) { 
-            System.out.println(Cores.ANSI_RED + "O ciclo limite de jogo foi excedido! Encerrando a partida."  + Cores.ANSI_RESET);
-            return true;
-        }
-        if (player1.getDef() <= 0) {
-            System.out.println(Cores.ANSI_RED + "O jogador simples foi derrotado! Encerrando a partida." + Cores.ANSI_RESET);
-            return true;
-        }
         int infecX = tabuleiro.getFonteInfecX();
         int infecY = tabuleiro.getFonteInfecY();
-        if (player1.getPosX() == infecX && player1.getPosY() == infecY) {
+        if (player1.getPosX() == infecX && player1.getPosY() == infecY) { // Caso P1 ache a fonte
             System.out.println(Cores.ANSI_GREEN + "\nO jogador simples (P1) encontrou a fonte da infecção! Encerrando a partida." + Cores.ANSI_RESET);
             return true;
         }
-        if (player2.getPosX() == infecX && player2.getPosY() == infecY) {
+        if (player2.getPosX() == infecX && player2.getPosY() == infecY) { // Caso P2 ache a fonte
             System.out.println(Cores.ANSI_GREEN + "\nO jogador suporte (P2) encontrou a fonte da infecção! Encerrando a partida." + Cores.ANSI_RESET);
+            return true;
+        }
+        if (cicloAtual > 25) { // Caso o limite de ciclos seja excedida
+            System.out.println(Cores.ANSI_RED + "O ciclo limite de jogo foi excedido! Encerrando a partida."  + Cores.ANSI_RESET);
+            return true;
+        }
+        if (player1.getDef() <= 0) { // Caso P1 tenha sido derrotado
+            System.out.println(Cores.ANSI_RED + "O jogador simples foi derrotado! Encerrando a partida." + Cores.ANSI_RESET);
             return true;
         }
         return false;
